@@ -13,12 +13,20 @@ import { formatDateTime, formatScore } from "@/lib/format";
 import { CriteriaReview } from "./criteria-review";
 import { RequirementSheet } from "./requirement-sheet";
 
-function PassMark({ value, disabled, onCommit }: { value: number; disabled: boolean; onCommit: (v: number) => void }) {
+function PassMark({
+  value,
+  disabled,
+  onCommit,
+}: {
+  value: number;
+  disabled: boolean;
+  onCommit: (v: number) => void;
+}) {
   const [draft, setDraft] = useState<number | null>(null);
   const shown = draft ?? value;
   return (
     <div className="flex w-56 items-center gap-3">
-      <span className="text-xs text-text-dim">Pass mark</span>
+      <span className="text-xs whitespace-nowrap text-text-dim">Pass mark</span>
       <Slider
         min={0}
         max={1}
@@ -37,21 +45,44 @@ function PassMark({ value, disabled, onCommit }: { value: number; disabled: bool
   );
 }
 
-function Toolbar({ cv, saving, onPassMark, jobId }: { cv: CriteriaVersion; saving: boolean; onPassMark: (v: number) => void; jobId: string }) {
+function Toolbar({
+  cv,
+  saving,
+  onPassMark,
+  jobId,
+}: {
+  cv: CriteriaVersion;
+  saving: boolean;
+  onPassMark: (v: number) => void;
+  jobId: string;
+}) {
   const approve = useApproveCriteria(jobId);
   const isDraft = cv.status === "draft";
   return (
-    <div className="flex items-center justify-between gap-4 rounded-xl border border-line bg-panel px-4 py-3">
-      <div className="flex items-center gap-3 text-sm">
+    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-3 rounded-xl border border-line bg-panel px-4 py-3">
+      <div className="flex min-w-0 items-center gap-3 text-sm">
         <StatusPill status={cv.status} />
         <span className="num text-text-muted">v{cv.version}</span>
-        <span className="truncate text-xs text-text-dim">{isDraft ? cv.model : `approved ${cv.approved_at ? formatDateTime(cv.approved_at) : ""} · edits start a new draft`}</span>
+        <span className="truncate text-xs text-text-dim">
+          {isDraft
+            ? cv.model
+            : `approved ${cv.approved_at ? formatDateTime(cv.approved_at) : ""} · edits start a new draft`}
+        </span>
       </div>
-      <div className="flex items-center gap-4">
-        <PassMark value={cv.pass_threshold} disabled={saving} onCommit={onPassMark} />
+      <div className="flex shrink-0 items-center gap-4">
+        <PassMark
+          value={cv.pass_threshold}
+          disabled={saving}
+          onCommit={onPassMark}
+        />
         {isDraft && (
-          <Button onClick={() => approve.mutate()} disabled={approve.isPending || cv.errors.length > 0} title={cv.errors.length ? "Fix the errors first" : undefined}>
-            <Check />Approve criteria
+          <Button
+            onClick={() => approve.mutate()}
+            disabled={approve.isPending || cv.errors.length > 0}
+            title={cv.errors.length ? "Fix the errors first" : undefined}
+          >
+            <Check />
+            Approve criteria
           </Button>
         )}
       </div>
@@ -64,19 +95,46 @@ export function CriteriaPanel({ job }: { job: Job }) {
   const save = useSaveCriteria(job.id);
   const [editing, setEditing] = useState<Requirement | null>(null);
 
-  if (criteria.isPending) return <div className="p-8"><SkeletonCards count={4} /></div>;
-  if (criteria.isError) return <div className="p-8"><ErrorState error={criteria.error} onRetry={() => void criteria.refetch()} /></div>;
+  if (criteria.isPending)
+    return (
+      <div className="p-8">
+        <SkeletonCards count={4} />
+      </div>
+    );
+  if (criteria.isError)
+    return (
+      <div className="p-8">
+        <ErrorState
+          error={criteria.error}
+          onRetry={() => void criteria.refetch()}
+        />
+      </div>
+    );
 
   const cv = criteria.data;
-  const saveWith = (requirements: Requirement[], passThreshold = cv.pass_threshold) =>
-    save.mutate({ requirements, job_facts: cv.job_facts, pass_threshold: passThreshold });
+  const saveWith = (
+    requirements: Requirement[],
+    passThreshold = cv.pass_threshold,
+  ) =>
+    save.mutate({
+      requirements,
+      job_facts: cv.job_facts,
+      pass_threshold: passThreshold,
+    });
 
   return (
     <>
       <CriteriaReview
         job={job}
         criteria={cv}
-        toolbar={<Toolbar cv={cv} jobId={job.id} saving={save.isPending} onPassMark={(v) => saveWith(cv.requirements, v)} />}
+        toolbar={
+          <Toolbar
+            cv={cv}
+            jobId={job.id}
+            saving={save.isPending}
+            onPassMark={(v) => saveWith(cv.requirements, v)}
+          />
+        }
         onEdit={setEditing}
         onDelete={(r) => saveWith(cv.requirements.filter((x) => x.id !== r.id))}
       />
