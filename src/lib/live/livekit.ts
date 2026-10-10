@@ -1,7 +1,21 @@
-import { type RemoteParticipant, type RemoteTrack, Room, RoomEvent, Track } from "livekit-client";
+import {
+  getLogger,
+  LoggerNames,
+  type RemoteParticipant,
+  type RemoteTrack,
+  Room,
+  RoomEvent,
+  Track,
+} from "livekit-client";
 import type { ViewerToken } from "@/lib/api/types";
 import type { Emit, LiveConnection } from "./connect";
-import { decodeJson, parseProgress, parseTurn, PROGRESS_TOPIC, TURNS_TOPIC } from "./messages";
+import {
+  decodeJson,
+  parseProgress,
+  parseTurn,
+  PROGRESS_TOPIC,
+  TURNS_TOPIC,
+} from "./messages";
 
 // LiveKit Agents 1.x conventions (Ruling 14)
 const TRANSCRIPTION = "lk.transcription";
@@ -10,15 +24,50 @@ const FINAL = "lk.transcription_final";
 const TRACK_ID = "lk.transcribed_track_id";
 const AGENT_STATE = "lk.agent.state";
 
+// The agent deletes the room when it ends a call. A viewer still attached then sees its data
+// channels drop, which livekit-client logs as errors (it hides them only when the client
+// disconnected first), and the dev overlay showed five errors after every call.
+const EXPECTED_ON_ROOM_DELETE =
+  /data channel '\w+' closed unexpectedly|DataChannel error on \w+: User-Initiated Abort/;
+
+export function isExpectedOnRoomDelete(msg: unknown): boolean {
+  return typeof msg === "string" && EXPECTED_ON_ROOM_DELETE.test(msg);
+}
+
+let quieted = false;
+
+/** Drops those expected messages from livekit-client's loggers; every other log still goes
+ * out unchanged. */
+function quietRoomDeletion(): void {
+  if (quieted) return;
+  quieted = true;
+  for (const name of Object.values(LoggerNames)) {
+    const logger = getLogger(name);
+    const factory = logger.methodFactory;
+    logger.methodFactory = (method, level, loggerName) => {
+      const raw = factory(method, level, loggerName);
+      return (...args: unknown[]) => {
+        if (!isExpectedOnRoomDelete(args[0])) raw(...args);
+      };
+    };
+    logger.setLevel(logger.getLevel());
+  }
+}
+
 /** Joins the call's room as a hidden, subscribe-only viewer and turns what happens there
  * into LiveMessages. Nothing is published. */
-export async function connectLiveKit(t: ViewerToken, emit: Emit): Promise<LiveConnection> {
+export async function connectLiveKit(
+  t: ViewerToken,
+  emit: Emit,
+): Promise<LiveConnection> {
+  quietRoomDeletion();
   const room = new Room({ adaptiveStream: false, dynacast: false });
   const audio = new Map<RemoteTrack, HTMLMediaElement>();
   let focused = false;
   let listening = false;
 
-  const agent = (): RemoteParticipant | undefined => [...room.remoteParticipants.values()].find((p) => p.isAgent);
+  const agent = (): RemoteParticipant | undefined =>
+    [...room.remoteParticipants.values()].find((p) => p.isAgent);
   const isAgentStream = (trackId: string | undefined, sender: string) => {
     const a = agent();
     if (trackId && a) return a.trackPublications.has(trackId);
@@ -28,14 +77,22 @@ export async function connectLiveKit(t: ViewerToken, emit: Emit): Promise<LiveCo
   room.registerTextStreamHandler(TRANSCRIPTION, (reader, from) => {
     const attrs = reader.info.attributes ?? {};
     const id = attrs[SEGMENT_ID] ?? reader.info.id;
-    const role = isAgentStream(attrs[TRACK_ID], from.identity) ? "agent" : "candidate";
+    const role = isAgentStream(attrs[TRACK_ID], from.identity)
+      ? "agent"
+      : "candidate";
     void (async () => {
       let text = "";
       for await (const chunk of reader) {
         text += chunk;
         emit({ type: "caption", id, role, text, final: false });
       }
-      emit({ type: "caption", id, role, text, final: attrs[FINAL] === "true" || role === "agent" });
+      emit({
+        type: "caption",
+        id,
+        role,
+        text,
+        final: attrs[FINAL] === "true" || role === "agent",
+      });
     })().catch(() => undefined);
   });
 
@@ -65,7 +122,9 @@ export async function connectLiveKit(t: ViewerToken, emit: Emit): Promise<LiveCo
   });
 
   const setSubscribed = (on: boolean) => {
-    for (const p of room.remoteParticipants.values()) for (const pub of p.audioTrackPublications.values()) pub.setSubscribed(on);
+    for (const p of room.remoteParticipants.values())
+      for (const pub of p.audioTrackPublications.values())
+        pub.setSubscribed(on);
   };
   room.on(RoomEvent.TrackPublished, (pub) => {
     if (pub.kind === Track.Kind.Audio) pub.setSubscribed(focused);
@@ -81,6 +140,11 @@ export async function connectLiveKit(t: ViewerToken, emit: Emit): Promise<LiveCo
   room.on(RoomEvent.TrackUnsubscribed, (track: RemoteTrack) => {
     for (const el of track.detach()) el.remove();
     audio.delete(track);
+  });
+  // The agent leaving means the call is over and the room is about to be deleted: leave
+  // first, so the disconnect is a clean one.
+  room.on(RoomEvent.ParticipantDisconnected, (p) => {
+    if (p.isAgent) void room.disconnect();
   });
   room.on(RoomEvent.Disconnected, () => emit({ type: "closed" }));
 
