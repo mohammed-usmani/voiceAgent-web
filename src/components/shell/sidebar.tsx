@@ -73,7 +73,10 @@ export function Sidebar() {
           <NavLink href="/evaluation" active={pathname.startsWith("/evaluation")}><FlaskConical className="size-4" />Evaluation</NavLink>
         </div>
       </nav>
-      <div className="border-t border-line px-5 py-3"><StreamBadge status={status} /></div>
+      <div className="border-t border-line px-5 py-3">
+        <p className="mb-2 text-[11px] text-text-dim"><kbd className="num">⌘K</kbd> jump · <kbd className="num">⌘J</kbd> live wall · <kbd className="num">⌘.</kbd> activity</p>
+        <StreamBadge status={status} />
+      </div>
     </aside>
   );
 }
