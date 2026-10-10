@@ -1,0 +1,18 @@
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env*.local
+.env
+coverage/
+playwright-report/
+test-results/
+blob-report/
+.DS_Store
+# AI tooling never goes in this repo
+CLAUDE.md
+AGENTS.md
+.claude/
+.cursor/
+.superpowers/

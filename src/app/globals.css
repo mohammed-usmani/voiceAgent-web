@@ -1,0 +1,126 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* surfaces */
+  --bg: #0b0d12;
+  --panel: #12151d;
+  --panel-raised: #171b26;
+  --line: #1f2430;
+  --line-strong: #2a3140;
+  /* text */
+  --text: #e6e9ef;
+  --text-muted: #8b93a7;
+  --text-dim: #5c6478;
+  /* signal: one accent, amber for warnings, rose for failures */
+  --teal: #7cf3c4;
+  --teal-ink: #062018;
+  --teal-soft: rgb(124 243 196 / 0.12);
+  --teal-glow: 0 0 0 1px rgb(124 243 196 / 0.35), 0 0 24px rgb(124 243 196 / 0.22);
+  --amber: #f3b27c;
+  --amber-soft: rgb(243 178 124 / 0.12);
+  --amber-glow: 0 0 0 1px rgb(243 178 124 / 0.35), 0 0 24px rgb(243 178 124 / 0.2);
+  --rose: #f37c8a;
+  --rose-soft: rgb(243 124 138 / 0.12);
+  --radius: 0.625rem;
+
+  /* shadcn/ui variable names, mapped onto the tokens above */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --card: var(--panel);
+  --card-foreground: var(--text);
+  --popover: var(--panel-raised);
+  --popover-foreground: var(--text);
+  --primary: var(--teal);
+  --primary-foreground: var(--teal-ink);
+  --secondary: var(--panel-raised);
+  --secondary-foreground: var(--text);
+  --muted: var(--panel-raised);
+  --muted-foreground: var(--text-muted);
+  --accent: var(--panel-raised);
+  --accent-foreground: var(--text);
+  --destructive: var(--rose);
+  --border: var(--line);
+  --input: var(--line-strong);
+  --ring: var(--teal);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-panel: var(--panel);
+  --color-panel-raised: var(--panel-raised);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-text-dim: var(--text-dim);
+  --color-teal: var(--teal);
+  --color-teal-ink: var(--teal-ink);
+  --color-teal-soft: var(--teal-soft);
+  --color-amber: var(--amber);
+  --color-amber-soft: var(--amber-soft);
+  --color-rose: var(--rose);
+  --color-rose-soft: var(--rose-soft);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-jetbrains);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@utility num {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+@utility glow {
+  box-shadow: var(--teal-glow);
+}
+
+@utility glow-amber {
+  box-shadow: var(--amber-glow);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-bg font-sans text-text antialiased;
+    min-width: 1280px;
+  }
+}
+
+/* sonner reads these */
+[data-sonner-toaster] {
+  --normal-bg: var(--panel-raised);
+  --normal-border: var(--line-strong);
+  --normal-text: var(--text);
+}
