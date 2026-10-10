@@ -6,13 +6,16 @@ import { Toaster } from "sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { makeQueryClient } from "@/lib/api/query-client";
 import { EventsProvider } from "@/lib/events/provider";
+import { LiveCallsProvider } from "@/lib/live/provider";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(makeQueryClient);
   return (
     <QueryClientProvider client={client}>
       <EventsProvider>
-        <TooltipProvider delayDuration={300}>{children}</TooltipProvider>
+        <LiveCallsProvider>
+          <TooltipProvider delayDuration={300}>{children}</TooltipProvider>
+        </LiveCallsProvider>
         <Toaster theme="dark" position="top-center" closeButton />
       </EventsProvider>
     </QueryClientProvider>
