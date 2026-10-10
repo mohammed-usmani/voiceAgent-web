@@ -2,6 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
+import { CandidatesTab } from "@/components/candidates/candidates-tab";
 import { JobBanner } from "@/components/criteria/job-banner";
 import { CriteriaTab } from "@/components/criteria/criteria-tab";
 import { PageHeader } from "@/components/page-header";
@@ -17,6 +18,7 @@ type TabId = "criteria" | "candidates" | "campaign" | "decisions";
 
 const TABS: { id: TabId; label: string; render: (job: Job) => ReactNode }[] = [
   { id: "criteria", label: "Criteria", render: (job) => <CriteriaTab job={job} /> },
+  { id: "candidates", label: "Candidates", render: (job) => <CandidatesTab job={job} /> },
 ];
 
 function JobWorkspace() {
