@@ -1,4 +1,6 @@
 import type { ReactNode } from "react";
+import type { DecisionResult } from "@/lib/api/types";
+import { RESULT_LABEL } from "@/lib/decisions";
 import { humanize } from "@/lib/format";
 import { type Tone, toneOf } from "@/lib/status";
 import { cn } from "@/lib/utils";
@@ -20,4 +22,8 @@ export function Pill({ tone = "muted", className, children }: { tone?: Tone; cla
 
 export function StatusPill({ status, className }: { status: string; className?: string }) {
   return <Pill tone={toneOf(status)} className={className}>{humanize(status)}</Pill>;
+}
+
+export function ResultPill({ result, className }: { result: DecisionResult; className?: string }) {
+  return <Pill tone={toneOf(result)} className={className}>{RESULT_LABEL[result]}</Pill>;
 }
