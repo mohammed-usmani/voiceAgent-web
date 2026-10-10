@@ -2,6 +2,7 @@
 
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
+import { JobBanner } from "@/components/criteria/job-banner";
 import { CriteriaTab } from "@/components/criteria/criteria-tab";
 import { PageHeader } from "@/components/page-header";
 import { StatusPill } from "@/components/pill";
@@ -52,6 +53,7 @@ function JobWorkspace() {
         subtitle={<span className="num">{j.timezone} · calls {j.calling_hours.start}–{j.calling_hours.end} · agent {j.agent_name}</span>}
         actions={<StatusPill status={j.status} />}
       />
+      <JobBanner job={j} />
       <Tabs value={tab} onValueChange={(t) => router.replace(`/jobs/${j.id}?tab=${t}`, { scroll: false })}>
         <TabsList className="mx-8 mt-4">
           {TABS.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}

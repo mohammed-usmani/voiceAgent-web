@@ -1,4 +1,4 @@
-import type { Requirement, RuleOp } from "./api/types";
+import type { Requirement, RequirementKind, Rule, RuleOp } from "./api/types";
 
 const NUM = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
@@ -48,4 +48,51 @@ export function answerKind(r: Pick<Requirement, "kind" | "unit" | "options">): s
     case "text":
       return "In their own words";
   }
+}
+
+export const OPS_BY_KIND: Record<RequirementKind, RuleOp[]> = {
+  number: [">=", "<=", ">", "<", "==", "between"],
+  boolean: ["=="],
+  choice: ["==", "in"],
+  text: [], // judged against a rubric, never by a rule
+};
+
+export function parseRuleValue(kind: RequirementKind, op: RuleOp, input: string, options: string[] | null = null): Rule["value"] | null {
+  const s = input.trim();
+  if (kind === "number") {
+    if (op === "between") {
+      const parts = s.split(/\s*(?:-|–|,|\bto\b|\band\b)\s*/).filter(Boolean).map(Number);
+      return parts.length === 2 && parts.every(Number.isFinite) && parts[0] <= parts[1] ? parts : null;
+    }
+    const n = Number(s);
+    return s !== "" && Number.isFinite(n) ? n : null;
+  }
+  if (kind === "boolean") {
+    if (/^(yes|true)$/i.test(s)) return true;
+    if (/^(no|false)$/i.test(s)) return false;
+    return null;
+  }
+  if (kind === "choice") {
+    const pick = (x: string) => options?.find((o) => o.toLowerCase() === x.trim().toLowerCase()) ?? null;
+    if (op === "in") {
+      const picked = s.split(",").map(pick);
+      return picked.length > 0 && picked.every((x): x is string => x !== null) ? picked : null;
+    }
+    return pick(s);
+  }
+  return null;
+}
+
+export function ruleValueInput(rule: Rule): string {
+  const v = rule.value;
+  if (Array.isArray(v)) return rule.op === "between" ? v.join("-") : v.join(", ");
+  if (typeof v === "boolean") return v ? "yes" : "no";
+  return String(v);
+}
+
+export function ruleInputHint(kind: RequirementKind, op: RuleOp): string {
+  if (kind === "number") return op === "between" ? "Two numbers, like 1-3" : "A number";
+  if (kind === "boolean") return "yes or no";
+  if (kind === "choice") return op === "in" ? "Options separated by commas" : "One of the options";
+  return "Free-text answers have no rule";
 }

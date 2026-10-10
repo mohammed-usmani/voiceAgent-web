@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { requirement } from "@/test/fixtures";
-import { answerKind, ruleText } from "./rules";
+import { answerKind, parseRuleValue, ruleInputHint, ruleText, ruleValueInput } from "./rules";
 
 describe("ruleText", () => {
   it("words number rules with their unit", () => {
@@ -32,5 +32,49 @@ describe("answerKind", () => {
     expect(answerKind(requirement({ kind: "boolean" }))).toBe("Yes or no");
     expect(answerKind(requirement({ kind: "choice", options: ["Day", "Night"] }))).toBe("One of: Day, Night");
     expect(answerKind(requirement({ kind: "text" }))).toBe("In their own words");
+  });
+});
+
+describe("parseRuleValue", () => {
+  it("reads numbers and ranges", () => {
+    expect(parseRuleValue("number", ">=", " 2 ")).toBe(2);
+    expect(parseRuleValue("number", ">=", "two")).toBeNull();
+    expect(parseRuleValue("number", ">=", "")).toBeNull();
+    expect(parseRuleValue("number", "between", "1-3")).toEqual([1, 3]);
+    expect(parseRuleValue("number", "between", "1 to 3")).toEqual([1, 3]);
+    expect(parseRuleValue("number", "between", "3-1")).toBeNull();
+  });
+
+  it("reads yes and no", () => {
+    expect(parseRuleValue("boolean", "==", "Yes")).toBe(true);
+    expect(parseRuleValue("boolean", "==", "false")).toBe(false);
+    expect(parseRuleValue("boolean", "==", "maybe")).toBeNull();
+  });
+
+  it("only accepts a choice's own options, in their spelling", () => {
+    const options = ["Day", "Night", "Rotational"];
+    expect(parseRuleValue("choice", "==", "night", options)).toBe("Night");
+    expect(parseRuleValue("choice", "in", "day, rotational", options)).toEqual(["Day", "Rotational"]);
+    expect(parseRuleValue("choice", "in", "day, evening", options)).toBeNull();
+  });
+
+  it("never gives a free-text answer a rule", () => {
+    expect(parseRuleValue("text", "==", "anything")).toBeNull();
+  });
+});
+
+describe("ruleValueInput", () => {
+  it("round-trips through parseRuleValue", () => {
+    expect(ruleValueInput({ op: "between", value: [1, 3] })).toBe("1-3");
+    expect(ruleValueInput({ op: "in", value: ["Day", "Night"] })).toBe("Day, Night");
+    expect(ruleValueInput({ op: "==", value: true })).toBe("yes");
+    expect(ruleValueInput({ op: ">=", value: 2 })).toBe("2");
+  });
+});
+
+describe("ruleInputHint", () => {
+  it("says what to type", () => {
+    expect(ruleInputHint("number", "between")).toBe("Two numbers, like 1-3");
+    expect(ruleInputHint("choice", "in")).toBe("Options separated by commas");
   });
 });
