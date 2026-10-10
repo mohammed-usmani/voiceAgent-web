@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { summary } from "@/test/fixtures";
-import { finalResult, latestByCandidate } from "./decisions";
+import { finalResult, latestByCandidate, queueOrder } from "./decisions";
 
 describe("decisions", () => {
   it("prefers the recruiter's result", () => {
@@ -15,5 +15,17 @@ describe("decisions", () => {
     const latest = latestByCandidate([recall, old, other]);
     expect(latest.get("c1")?.id).toBe("b");
     expect(latest.get("c2")?.id).toBe("c");
+  });
+});
+
+describe("queueOrder", () => {
+  it("puts what needs review first, oldest first, then the rest newest first", () => {
+    const ds = [
+      summary({ id: "sent-old", status: "sent", created_at: "2026-10-08T08:00:00Z" }),
+      summary({ id: "pending-new", created_at: "2026-10-10T08:00:00Z" }),
+      summary({ id: "sent-new", status: "sent", created_at: "2026-10-09T08:00:00Z" }),
+      summary({ id: "pending-old", created_at: "2026-10-09T07:00:00Z" }),
+    ];
+    expect(queueOrder(ds).map((d) => d.id)).toEqual(["pending-old", "pending-new", "sent-new", "sent-old"]);
   });
 });

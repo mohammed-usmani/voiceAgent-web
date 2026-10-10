@@ -3,8 +3,10 @@
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
 import { CandidatesTab } from "@/components/candidates/candidates-tab";
+import { CampaignTab } from "@/components/campaign/campaign-tab";
 import { JobBanner } from "@/components/criteria/job-banner";
 import { CriteriaTab } from "@/components/criteria/criteria-tab";
+import { DecisionQueue } from "@/components/decisions/decision-queue";
 import { PageHeader } from "@/components/page-header";
 import { StatusPill } from "@/components/pill";
 import { ErrorState, SkeletonCards } from "@/components/states";
@@ -19,6 +21,8 @@ type TabId = "criteria" | "candidates" | "campaign" | "decisions";
 const TABS: { id: TabId; label: string; render: (job: Job) => ReactNode }[] = [
   { id: "criteria", label: "Criteria", render: (job) => <CriteriaTab job={job} /> },
   { id: "candidates", label: "Candidates", render: (job) => <CandidatesTab job={job} /> },
+  { id: "campaign", label: "Campaign", render: (job) => <CampaignTab job={job} /> },
+  { id: "decisions", label: "Decisions", render: (job) => <div className="p-8"><DecisionQueue jobId={job.id} /></div> },
 ];
 
 function JobWorkspace() {

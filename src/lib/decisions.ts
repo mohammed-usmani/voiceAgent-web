@@ -18,3 +18,10 @@ export function latestByCandidate(decisions: DecisionSummary[]): Map<string, Dec
   }
   return latest;
 }
+
+/** The review queue: pending first (oldest first, as the backend's queue), then the rest newest first. */
+export function queueOrder(decisions: DecisionSummary[]): DecisionSummary[] {
+  const pending = decisions.filter((d) => d.status === "pending_review").sort((a, b) => Date.parse(a.created_at) - Date.parse(b.created_at));
+  const rest = decisions.filter((d) => d.status !== "pending_review").sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
+  return [...pending, ...rest];
+}
