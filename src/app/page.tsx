@@ -10,7 +10,7 @@ import { PageHeader } from "@/components/page-header";
 import { EmptyState, ErrorState, SkeletonCards } from "@/components/states";
 import { Button } from "@/components/ui/button";
 import { useActiveCalls, useAllCandidates, useDecisions, useEvalRuns, useJobs } from "@/lib/api/queries";
-import { formatDateTime, formatUsd } from "@/lib/format";
+import { formatUsd } from "@/lib/format";
 import { outcomeBuckets, overviewStats } from "@/lib/overview";
 import { useNow } from "@/lib/use-now";
 
@@ -51,11 +51,11 @@ export default function OverviewPage() {
           <StatTile label="Live now" value={stats?.liveNow ?? "—"} live={(stats?.liveNow ?? 0) > 0} sub="calls in progress" />
           <StatTile label="Screened today" value={stats?.screenedToday ?? "—"} sub="decisions made" />
           <StatTile label="Suitable today" value={stats?.suitableToday ?? "—"} sub="after any override" />
-          <StatTile label="Awaiting review" value={stats?.awaitingReview ?? "—"} warn={(stats?.awaitingReview ?? 0) > 0} sub="decisions to approve" />
+          <StatTile label="Awaiting review" value={stats?.awaitingReview ?? "—"} warn={(stats?.awaitingReview ?? 0) > 0} sub="to approve" />
           <StatTile
             label="Cost per call"
             value={formatUsd(typeof perCall === "number" ? perCall : null)}
-            sub={latestRun ? `evaluation run, ${formatDateTime(latestRun.started_at)}` : "no evaluation run yet"}
+            sub={latestRun ? "latest evaluation run" : "no evaluation run yet"}
           />
         </section>
         {jobs.isPending ? (

@@ -18,6 +18,8 @@ describe("format", () => {
     expect(formatScore(undefined)).toBe("—");
     expect(formatPercent(null)).toBe("—");
     expect(formatMetric(null)).toBe("—");
+    expect(formatDelta(3)).toBe("+3");
+    expect(formatDelta(-0.052)).toBe("−0.052");
     expect(formatDelta(null)).toBe("—");
   });
 
@@ -46,7 +48,9 @@ describe("format", () => {
 
   it("formats clock times in a time zone", () => {
     expect(formatClock("2026-10-10T08:30:00Z", "Asia/Kolkata")).toBe("14:00");
-    expect(formatDateTime("2026-10-10T08:30:00Z", "UTC")).toMatch(/10 Oct.*08:30/);
+    expect(formatDateTime("2026-10-10T08:30:00Z", "UTC")).toMatch(
+      /10 Oct.*08:30/,
+    );
   });
 
   it("formats relative times", () => {

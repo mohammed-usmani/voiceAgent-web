@@ -31,7 +31,9 @@ export function formatMetric(v: number | boolean | null | undefined): string {
 export function formatDelta(v: number | null | undefined): string {
   if (v == null) return DASH;
   if (v === 0) return "±0";
-  return `${v > 0 ? "+" : "−"}${Math.abs(v).toFixed(3)}`;
+  // A count (wrong invites caught) changes by whole numbers: "+3", not "+3.000".
+  const size = Math.abs(v);
+  return `${v > 0 ? "+" : "−"}${Number.isInteger(size) ? size : size.toFixed(3)}`;
 }
 
 export function formatDuration(ms: number): string {
@@ -63,7 +65,10 @@ export function formatDateTime(iso: string, timeZone?: string): string {
 }
 
 function formatDay(iso: string): string {
-  return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(iso));
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+  }).format(new Date(iso));
 }
 
 export function formatRelative(iso: string, now: number): string {
