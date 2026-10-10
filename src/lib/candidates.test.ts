@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { call, candidate } from "@/test/fixtures";
-import { candidateActions, hasActiveCall, lastCall } from "./candidates";
+import type { Decision } from "@/lib/api/types";
+import { call, candidate, summary } from "@/test/fixtures";
+import { candidateActions, candidateTimeline, hasActiveCall, lastCall } from "./candidates";
 
 describe("candidateActions", () => {
   it("offers a call to someone not yet screened", () => {
@@ -30,5 +31,35 @@ describe("calls", () => {
     expect(hasActiveCall(calls)).toBe(true);
     expect(lastCall([])).toBeNull();
     expect(hasActiveCall(undefined)).toBe(false);
+  });
+});
+
+
+describe("candidateTimeline", () => {
+  it("tells the candidate's story from their calls, decision and message, newest first", () => {
+    const c = candidate("c1", "notified", { created_at: "2026-10-10T07:00:00Z" });
+    const calls = [
+      call({ id: "k1", attempt: 1, status: "no_answer", end_reason: null, created_at: "2026-10-10T07:10:00Z", started_at: null, ended_at: "2026-10-10T07:11:00Z" }),
+      call({ id: "k2", attempt: 2, created_at: "2026-10-10T09:10:00Z", started_at: "2026-10-10T09:11:00Z", ended_at: "2026-10-10T09:17:00Z" }),
+    ];
+    const decision = {
+      ...summary({ created_at: "2026-10-10T09:18:00Z", result: "suitable" }),
+      message: { sent_at: "2026-10-10T09:30:00Z", kind: "invite" },
+    } as unknown as Decision;
+    expect(candidateTimeline(c, calls, decision).map((i) => [i.at.slice(11, 16), i.text])).toEqual([
+      ["09:30", "Invitation sent"],
+      ["09:18", "Decision: suitable"],
+      ["09:17", "Call 2 ended: completed"],
+      ["09:11", "Call 2 answered"],
+      ["09:10", "Call 2 queued"],
+      ["07:11", "Call 1: no answer"],
+      ["07:10", "Call 1 queued"],
+      ["07:00", "Added"],
+    ]);
+  });
+
+  it("shows when calling was stopped", () => {
+    const c = candidate("c1", "pending", { excluded_at: "2026-10-10T08:00:00Z" });
+    expect(candidateTimeline(c, [], null)[0]).toMatchObject({ text: "Calling stopped", tone: "amber" });
   });
 });
