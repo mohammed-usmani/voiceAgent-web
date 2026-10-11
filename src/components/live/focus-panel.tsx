@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Maximize2, Volume2, VolumeX } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { useApprovedCriteria } from "@/lib/api/queries";
+import { useEffect } from "react";
+import { useApprovedCriteria, useDecision } from "@/lib/api/queries";
 import { focusedCall, type LiveCall } from "@/lib/live/focus";
 import { useLiveCall, useLiveCalls } from "@/lib/live/provider";
 import { useElapsed } from "@/lib/use-now";
@@ -61,8 +62,19 @@ function LiveBody({ call }: { call: LiveCall }) {
   );
 }
 
+/** The result card, with the decision's final result; once it's acted on, the card goes. */
+function Ended({ call }: { call: LiveCall }) {
+  const { dispatch } = useLiveCalls();
+  const decision = useDecision(call.decision?.id).data;
+  const settled = decision && decision.status !== "pending_review" ? decision.id : null;
+  useEffect(() => {
+    if (settled) dispatch({ type: "settled", decisionId: settled });
+  }, [settled, dispatch]);
+  return <ResultCard call={call} final={decision?.final_result ?? null} onDismiss={() => dispatch({ type: "dismiss", callId: call.id })} />;
+}
+
 export function FocusPanel() {
-  const { state, dispatch } = useLiveCalls();
+  const { state } = useLiveCalls();
   const call = focusedCall(state);
   const live = useLiveCall(call?.id ?? "");
   return (
@@ -80,7 +92,7 @@ export function FocusPanel() {
             call.phase === "live" ? glowFor(live.agentState) : "border-line-strong",
           )}
         >
-          {call.phase === "live" ? <LiveBody call={call} /> : <ResultCard call={call} onDismiss={() => dispatch({ type: "dismiss", callId: call.id })} />}
+          {call.phase === "live" ? <LiveBody call={call} /> : <Ended call={call} />}
         </motion.section>
       )}
     </AnimatePresence>

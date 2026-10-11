@@ -68,6 +68,8 @@ export function LiveCallsProvider({ children }: { children: ReactNode }) {
       if (e.type === "ended") dispatch({ type: "ended", callId: e.entity_id, reason, now: Date.now() });
       else if (UNANSWERED.has(e.type)) dispatch({ type: "ended", callId: e.entity_id, reason: e.type, now: Date.now() });
       else if (e.type === "not_assessed") dispatch({ type: "notAssessed", callId: e.entity_id });
+    } else if (e.entity === "decision" && (e.type === "approved" || e.type === "overridden")) {
+      dispatch({ type: "settled", decisionId: e.entity_id });
     } else if (e.entity === "decision" && e.type === "created") {
       const { call_id: callId, result } = e.data;
       if (typeof callId === "string" && typeof result === "string" && RESULTS.has(result)) {

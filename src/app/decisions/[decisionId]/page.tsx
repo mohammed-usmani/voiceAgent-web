@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useEffect } from "react";
 import { ApproveButton } from "@/components/decisions/approve-button";
 import { MessageEditor } from "@/components/decisions/message-editor";
 import { OverrideDialog } from "@/components/decisions/override-dialog";
@@ -15,6 +16,7 @@ import { isNotFound } from "@/lib/api/errors";
 import { useApprovedCriteria, useDecision, useJob } from "@/lib/api/queries";
 import { decisionRows, finalResult, RESULT_LABEL } from "@/lib/decisions";
 import { formatDateTime } from "@/lib/format";
+import { useLiveCalls } from "@/lib/live/provider";
 
 export default function DecisionPage() {
   const { decisionId } = useParams<{ decisionId: string }>();
@@ -22,6 +24,9 @@ export default function DecisionPage() {
   const d = decision.data;
   const job = useJob(d?.job_id);
   const criteria = useApprovedCriteria(d?.job_id);
+  const { dispatch } = useLiveCalls();
+  // the recruiter is looking at it: a live-call result card for this decision has done its job
+  useEffect(() => dispatch({ type: "settled", decisionId }), [decisionId, dispatch]);
 
   if (decision.isPending)
     return (

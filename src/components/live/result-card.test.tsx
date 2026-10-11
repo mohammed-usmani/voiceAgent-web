@@ -30,4 +30,11 @@ describe("ResultCard", () => {
     expect(await screen.findByText("Suitable")).toBeInTheDocument();
     expect(await screen.findByRole("link", { name: "Review decision" })).toHaveAttribute("href", "/decisions/d9");
   });
+
+  it("shows the recruiter's result over the agent's verdict", () => {
+    render(<ResultCard call={{ ...ended, decision: { id: "d9", result: "needs_review" } }} final="suitable" onDismiss={() => {}} />);
+    expect(screen.getByText("Result")).toBeInTheDocument();
+    expect(screen.getByText("Suitable")).toBeInTheDocument();
+    expect(screen.queryByText("Needs review")).not.toBeInTheDocument();
+  });
 });

@@ -75,6 +75,35 @@ describe("focus rules", () => {
     expect(focusReducer(s, { type: "dismiss", callId: "a" }).focusedId).toBeNull();
   });
 
+  it("drops the result card once its decision is approved, overridden or opened", () => {
+    const decided = run([
+      sync(A),
+      { type: "ended", callId: "a", reason: "completed", now: 1 },
+      { type: "decided", callId: "a", decisionId: "d1", result: "needs_review" },
+    ]);
+    expect(focusReducer(decided, { type: "settled", decisionId: "other" })).toBe(decided);
+    const settled = focusReducer(decided, { type: "settled", decisionId: "d1" });
+    expect(settled.focusedId).toBeNull();
+    expect(settled.calls.a).toBeUndefined();
+  });
+
+  it("hands the focus to a live call when the result card is settled", () => {
+    const s = run([
+      sync(A, B),
+      { type: "ended", callId: "a", reason: "completed", now: 1 },
+      { type: "decided", callId: "a", decisionId: "d1", result: "suitable" },
+      { type: "settled", decisionId: "d1" },
+    ]);
+    expect(s.focusedId).toBe("b");
+    expect(s.calls.b.phase).toBe("live");
+  });
+
+  it("never lets a settled decision displace a live call", () => {
+    // a decision can't belong to a live call, but if events arrive out of order the call stays
+    const s = run([sync(A), { type: "decided", callId: "a", decisionId: "d1", result: "suitable" }]);
+    expect(focusReducer(s, { type: "settled", decisionId: "d1" })).toBe(s);
+  });
+
   it("drops a docked call from the dock when it ends", () => {
     const s = run([sync(A, B), { type: "ended", callId: "b", reason: "no_answer", now: 1 }]);
     expect(s.calls.b).toBeUndefined();

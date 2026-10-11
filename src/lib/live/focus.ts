@@ -34,6 +34,8 @@ export type FocusAction =
   | { type: "advance"; callId: string } // the focused call's result card has had its ~5 s
   | { type: "focus"; callId: string }
   | { type: "dismiss"; callId: string }
+  // the decision was approved or overridden, or its page was opened: its result card is done
+  | { type: "settled"; decisionId: string }
   | { type: "wall"; open: boolean };
 
 export const initialFocus: FocusState = { calls: {}, order: [], focusedId: null, wallOpen: false };
@@ -119,6 +121,10 @@ export function focusReducer(s: FocusState, a: FocusAction): FocusState {
       if (!s.calls[a.callId]) return s;
       const next = without(s, a.callId);
       return next.focusedId ? next : { ...next, focusedId: longestRunning(next) };
+    }
+    case "settled": {
+      const c = Object.values(s.calls).find((x) => x.decision?.id === a.decisionId);
+      return c?.phase === "ended" ? focusReducer(s, { type: "dismiss", callId: c.id }) : s;
     }
     case "wall":
       return { ...s, wallOpen: a.open };

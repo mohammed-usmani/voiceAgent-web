@@ -30,6 +30,36 @@ test("a live call pops up, streams, and flips to its verdict", async ({ page }) 
   await expect(panel.getByRole("link", { name: "Review decision" })).toBeVisible();
 });
 
+test("the result card goes once its decision is overridden elsewhere", async ({ page }) => {
+  await open(page, "/");
+  const call = await answer("cand-vikram");
+  const panel = page.getByRole("region", { name: "Live call with Vikram Singh" });
+  await expect(panel.getByText("Hidden viewer")).toBeVisible();
+  await backend("end", { callId: call.id });
+  const decision = await backend<{ id: string }>("decide", { callId: call.id, result: "needs_review" });
+  await expect(panel.getByText("Needs review")).toBeVisible();
+  // another recruiter (or another tab) overrides it
+  const res = await fetch(`http://127.0.0.1:8787/decisions/${decision.id}:override`, {
+    method: "POST",
+    headers: { "content-type": "application/json", "x-api-key": "test-key" },
+    body: JSON.stringify({ result: "suitable", note: "Clear answers." }),
+  });
+  expect(res.ok).toBe(true);
+  await expect(panel).toHaveCount(0);
+});
+
+test("the result card goes when its decision is opened", async ({ page }) => {
+  await open(page, "/");
+  const call = await answer("cand-vikram");
+  const panel = page.getByRole("region", { name: "Live call with Vikram Singh" });
+  await expect(panel.getByText("Hidden viewer")).toBeVisible();
+  await backend("end", { callId: call.id });
+  await backend("decide", { callId: call.id, result: "needs_review" });
+  await panel.getByRole("link", { name: "Review decision" }).click();
+  await expect(page).toHaveURL(/\/decisions\/dec-/);
+  await expect(panel).toHaveCount(0);
+});
+
 test("a second call docks without stealing focus", async ({ page }) => {
   await open(page, "/");
   await answer("cand-vikram");
