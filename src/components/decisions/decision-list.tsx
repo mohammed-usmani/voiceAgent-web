@@ -3,7 +3,7 @@
 import { Inbox } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ResultPill } from "@/components/pill";
+import { ResultPill, StatusPill } from "@/components/pill";
 import { ErrorState, SkeletonRows } from "@/components/states";
 import { useDecisions, useJobs } from "@/lib/api/queries";
 import { finalResult, queueOrder } from "@/lib/decisions";
@@ -22,7 +22,12 @@ export function DecisionList({ filter, onFilter, selectedId }: { filter: ListFil
   const jobs = useJobs();
   const now = useNow(60_000);
   const titles = new Map((jobs.data ?? []).map((j) => [j.id, j.title]));
-  const queue = decisions.data ? queueOrder(decisions.data) : [];
+  // To review: the backend's queue order. All: a history, newest first, so it reads differently.
+  const queue = !decisions.data
+    ? []
+    : filter === "pending"
+      ? queueOrder(decisions.data)
+      : [...decisions.data].sort((a, b) => Date.parse(b.created_at) - Date.parse(a.created_at));
   const at = queue.findIndex((d) => d.id === selectedId);
   const step = (by: number) => {
     const next = queue[Math.min(queue.length - 1, Math.max(0, at + by))];
@@ -77,6 +82,7 @@ export function DecisionList({ filter, onFilter, selectedId }: { filter: ListFil
                 </span>
                 <span className="flex items-center gap-2">
                   <ResultPill result={finalResult(d)} />
+                  {filter === "all" && <StatusPill status={d.status} />}
                   <span className="truncate text-sm text-text-dim">{titles.get(d.job_id) ?? ""}</span>
                 </span>
               </Link>

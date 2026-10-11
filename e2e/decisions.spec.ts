@@ -90,3 +90,12 @@ test("J and K step through the review queue beside the open decision", async ({ 
   await page.keyboard.press("k");
   await expect(page).toHaveURL(/\/decisions\/dec-rahul$/);
 });
+
+test("All lists every decision newest first, with its status", async ({ page }) => {
+  await open(page, "/decisions");
+  const queue = page.getByRole("region", { name: "Decisions" });
+  await expect(queue.getByRole("link", { name: /Meera Nair/ })).toHaveCount(0);
+  await queue.getByRole("button", { name: "All" }).click();
+  await expect(queue.getByRole("link", { name: /Meera Nair/ })).toBeVisible();
+  await expect(queue.getByRole("link", { name: /Meera Nair/ }).getByText("Sent")).toBeVisible();
+});
