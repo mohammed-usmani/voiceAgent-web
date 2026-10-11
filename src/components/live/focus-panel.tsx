@@ -10,7 +10,7 @@ import { focusedCall, type LiveCall } from "@/lib/live/focus";
 import { useLiveCall, useLiveCalls } from "@/lib/live/provider";
 import { useElapsed } from "@/lib/use-now";
 import { cn } from "@/lib/utils";
-import { AgentStateLabel, glowFor } from "./agent-state";
+import { AgentStateBar, glowFor } from "./agent-state";
 import { Captions } from "./captions";
 import { QuestionChecklist } from "./question-checklist";
 import { ResultCard } from "./result-card";
@@ -28,11 +28,10 @@ function LiveBody({ call }: { call: LiveCall }) {
     <>
       <header className="flex items-center justify-between gap-3 border-b border-line px-4 py-3">
         <div className="min-w-0">
-          <Link href={`/candidates/${call.candidateId}`} className="block truncate font-medium hover:text-teal">{call.candidateName}</Link>
+          <Link href={`/candidates/${call.candidateId}`} className="block truncate font-semibold hover:text-teal">{call.candidateName}</Link>
           <p className="truncate text-xs text-text-muted">{call.jobTitle}</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
-          <AgentStateLabel state={live.agentState} />
           <span className="num text-sm text-text-muted">{elapsed}</span>
           <Button size="icon" variant="ghost" aria-label="Open the live wall" onClick={() => dispatch({ type: "wall", open: true })}><Maximize2 /></Button>
         </div>
@@ -44,7 +43,10 @@ function LiveBody({ call }: { call: LiveCall }) {
         </div>
       ) : (
         <>
-          <Waveform levels={live.levels} state={live.agentState} />
+          <div className="flex items-center gap-3 px-4 pt-3">
+            <div className="w-32 shrink-0"><Waveform levels={live.levels} state={live.agentState} compact /></div>
+            <div className="flex-1"><AgentStateBar state={live.agentState} /></div>
+          </div>
           <Captions captions={live.captions} />
           <div className="max-h-56 overflow-y-auto border-t border-line">
             <QuestionChecklist requirements={criteria.data?.requirements ?? []} asking={live.asking} asked={live.asked} />
@@ -88,7 +90,7 @@ export function FocusPanel() {
           exit={{ opacity: 0, y: 24, scale: 0.96 }}
           transition={{ type: "spring", stiffness: 260, damping: 24 }}
           className={cn(
-            "fixed right-6 bottom-20 z-40 w-[27rem] overflow-hidden rounded-xl border bg-panel/95 shadow-2xl backdrop-blur transition-shadow",
+            "fixed right-6 bottom-20 z-40 w-[30rem] overflow-hidden rounded-2xl border bg-panel/95 shadow-2xl backdrop-blur transition-shadow",
             call.phase === "live" ? glowFor(live.agentState) : "border-line-strong",
           )}
         >

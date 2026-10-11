@@ -10,11 +10,14 @@ export function RequirementCard({ r, active, onHover, actions }: { r: Requiremen
     <article
       onMouseEnter={() => onHover(r.id)}
       onMouseLeave={() => onHover(null)}
-      className={cn("rounded-xl border border-line bg-panel p-4 transition", active && "glow border-teal/50")}
+      // keyboard users get the same source highlight while focus is inside the card
+      onFocus={() => onHover(r.id)}
+      onBlur={() => onHover(null)}
+      className={cn("rounded-2xl border border-line bg-panel p-5 transition", active && "border-teal/50 bg-[#0f1a17] shadow-[0_0_0_3px_rgb(110_231_192/0.08)]")}
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="font-medium">{r.label}</h3>
+          <h3 className="text-[15px] font-semibold">{r.label}</h3>
           <p className="mt-1 text-sm text-text-muted">&ldquo;{r.question}&rdquo;</p>
         </div>
         <div className="flex shrink-0 items-center gap-1.5">

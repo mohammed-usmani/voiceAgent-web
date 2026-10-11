@@ -1,23 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { CommandDialog, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { useAllCandidates, useDecisions, useJobs } from "@/lib/api/queries";
-import { useHotkey } from "@/lib/hotkeys";
 import { useLiveCalls } from "@/lib/live/provider";
 import { type PaletteItem, paletteItems } from "@/lib/palette";
 
 const GROUPS: PaletteItem["group"][] = ["Go to", "Live calls", "Jobs", "Candidates", "Decisions to review", "Actions"];
 
-export function CommandPalette({ onToggleRail }: { onToggleRail: () => void }) {
-  const [open, setOpen] = useState(false);
+/** Opened by ⌘K or the sidebar's search button; the shell owns `open`. */
+export function CommandPalette({ open, onOpenChange: setOpen, onToggleRail }: { open: boolean; onOpenChange: (open: boolean) => void; onToggleRail: () => void }) {
   const router = useRouter();
   const jobs = useJobs();
   const candidates = useAllCandidates(open ? jobs.data : []); // loaded when first opened
   const decisions = useDecisions({ status: "pending_review" });
   const { state, dispatch } = useLiveCalls();
-  useHotkey("mod+k", () => setOpen((o) => !o));
 
   const items = paletteItems({
     jobs: jobs.data ?? [],

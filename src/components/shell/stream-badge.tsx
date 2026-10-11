@@ -3,7 +3,7 @@
 import type { StreamStatus } from "@/lib/events/stream";
 import { cn } from "@/lib/utils";
 
-const LABEL: Record<StreamStatus, string> = { open: "Live", connecting: "Connecting…", reconnecting: "Reconnecting…" };
+const LABEL: Record<StreamStatus, string> = { open: "Live updates on", connecting: "Connecting…", reconnecting: "Reconnecting…" };
 
 export function StreamBadge({ status }: { status: StreamStatus }) {
   return (

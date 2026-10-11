@@ -8,14 +8,17 @@ export function QuestionChecklist({ requirements, asking, asked }: { requirement
   return (
     <div className="px-4 py-3">
       <p className="mb-2 flex items-center justify-between text-[11px] tracking-wider text-text-dim uppercase">
-        Questions <span className="num normal-case">{done}/{requirements.length}</span>
+        Questions <span className="num text-xs text-teal normal-case">{done} / {requirements.length} covered</span>
       </p>
-      <ul className="space-y-1 text-sm">
+      <div className="mb-2.5 h-1 overflow-hidden rounded-full bg-line" aria-hidden>
+        <div className="h-full rounded-full bg-teal transition-[width] duration-500" style={{ width: `${(done / requirements.length) * 100}%` }} />
+      </div>
+      <ul className="-mx-1.5 space-y-0.5 text-sm">
         {requirements.map((r) => {
           const now = asking === r.id;
           const state = now ? "asking" : asked.includes(r.id) ? "asked" : "pending";
           return (
-            <li key={r.id} data-state={state} className="flex items-center gap-2">
+            <li key={r.id} data-state={state} className={cn("flex items-center gap-2 rounded-md px-1.5 py-1", state === "asking" && "bg-teal-soft")}>
               {state === "asked" && <Check className="size-3.5 text-teal" aria-label="asked" />}
               {state === "asking" && <span className="glow size-2 animate-pulse rounded-full bg-teal" aria-label="asking now" />}
               {state === "pending" && <Circle className="size-3 text-text-dim" aria-label="not asked yet" />}

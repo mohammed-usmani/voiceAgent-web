@@ -4,6 +4,8 @@ import { FlaskConical } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { DecisionMatrix } from "@/components/evaluation/decision-matrix";
+import { DecisionModel } from "@/components/evaluation/decision-model";
+import { Headline } from "@/components/evaluation/headline";
 import { KnownLimits } from "@/components/evaluation/known-limits";
 import { PersonaTable } from "@/components/evaluation/persona-table";
 import { RunCompare } from "@/components/evaluation/run-compare";
@@ -37,7 +39,7 @@ function Evaluation() {
   const header = (
     <PageHeader
       title="Evaluation"
-      subtitle="Every stage of the pipeline, measured on six reference jobs with simulated candidates"
+      subtitle="Does it screen well? Every stage measured on reference jobs with simulated candidates, misses included."
       actions={
         <div className="flex items-center gap-2">
           <Switch id="offline" checked={showOffline} onCheckedChange={setShowOffline} />
@@ -67,6 +69,7 @@ function Evaluation() {
     <>
       {header}
       <div className="space-y-8 p-8">
+        {r && <Headline summary={r.summary} />}
         <RunTimeline runs={list} selected={selected} onSelect={(name) => setParam("run", name)} />
         {run.isPending && <SkeletonCards count={6} />}
         {run.isError && <ErrorState error={run.error} onRetry={() => void run.refetch()} title="Couldn't load this run" />}
@@ -86,6 +89,7 @@ function Evaluation() {
             <PersonaTable calls={r.calls} />
           </>
         )}
+        {!showOffline && <DecisionModel />}
         <KnownLimits />
       </div>
     </>

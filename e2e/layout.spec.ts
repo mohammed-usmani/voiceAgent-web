@@ -4,7 +4,7 @@ import { backend, open } from "./support.ts";
 test.beforeEach(() => backend("reset"));
 
 const PAGES: [name: string, path: string, ready: string][] = [
-  ["overview", "/", "Latest decisions"],
+  ["overview", "/", "Needs you"],
   ["job criteria", "/jobs/job-analyst?tab=criteria", "Dropped by the agent"],
   ["job candidates", "/jobs/job-support?tab=candidates", "Ananya Rao"],
   ["job campaign", "/jobs/job-support?tab=campaign", "Calling hours"],

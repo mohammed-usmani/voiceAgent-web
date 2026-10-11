@@ -1,23 +1,14 @@
-"use client";
+import { Inbox } from "lucide-react";
 
-import { useState } from "react";
-import { DecisionQueue } from "@/components/decisions/decision-queue";
-import { PageHeader } from "@/components/page-header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-
+/** Beside the inbox on a wide screen, until a decision is picked. */
 export default function DecisionsPage() {
-  const [tab, setTab] = useState("pending");
   return (
-    <>
-      <PageHeader title="Decisions" subtitle="Every screening call ends in a decision. Approve it to send the message, or override it." />
-      <Tabs value={tab} onValueChange={setTab} className="p-8">
-        <TabsList>
-          <TabsTrigger value="pending">To review</TabsTrigger>
-          <TabsTrigger value="all">All</TabsTrigger>
-        </TabsList>
-        <TabsContent value="pending" className="mt-4"><DecisionQueue status="pending_review" /></TabsContent>
-        <TabsContent value="all" className="mt-4"><DecisionQueue /></TabsContent>
-      </Tabs>
-    </>
+    <div className="grid h-full min-h-[60vh] place-items-center p-8">
+      <div className="max-w-sm text-center">
+        <Inbox className="mx-auto mb-4 size-7 text-text-dim" aria-hidden />
+        <p className="font-semibold">Pick a decision to review</p>
+        <p className="mt-1 text-sm text-text-muted">Each one shows the candidate&apos;s own words for every requirement, a second model&apos;s check, and the message that will go out.</p>
+      </div>
+    </div>
   );
 }

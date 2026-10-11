@@ -57,7 +57,7 @@ test("the review queue lists pending decisions", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Rahul Verma" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Meera Nair" })).toHaveCount(0);
   await expect(
-    page.getByRole("link", { name: /Decisions/ }).getByLabel("2 pending"),
+    page.getByRole("link", { name: /Decisions/ }).getByLabel("2 to review"),
   ).toBeVisible();
 });
 
@@ -79,4 +79,14 @@ test("an override teaches the scorer only from answers the recruiter ticks", asy
   );
   await page.getByRole("button", { name: "Save override" }).click();
   expect((await sent).postDataJSON().requirement_ids).toEqual([]);
+});
+
+test("J and K step through the review queue beside the open decision", async ({ page }) => {
+  await open(page, "/decisions/dec-rahul");
+  const queue = page.getByRole("region", { name: "Decisions" });
+  await expect(queue.getByRole("link", { name: /Rahul Verma/ })).toHaveAttribute("aria-current", "page");
+  await page.keyboard.press("j");
+  await expect(page).toHaveURL(/\/decisions\/dec-ananya$/);
+  await page.keyboard.press("k");
+  await expect(page).toHaveURL(/\/decisions\/dec-rahul$/);
 });

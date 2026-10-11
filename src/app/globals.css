@@ -6,25 +6,27 @@
 
 :root {
   /* surfaces */
-  --bg: #0b0d12;
-  --panel: #12151d;
-  --panel-raised: #171b26;
-  --line: #1f2430;
-  --line-strong: #2a3140;
+  --bg: #0a0c10;
+  --panel: #11141b;
+  --panel-raised: #171b24;
+  --line: #222735;
+  --line-strong: #2f3646;
   /* text */
-  --text: #e6e9ef;
-  --text-muted: #8b93a7;
-  --text-dim: #5c6478;
+  --text: #e8ebf2;
+  --text-muted: #aab2c3;
+  --text-dim: #8d96aa; /* 4.5:1 on panels: captions must stay readable */
   /* signal: one accent, amber for warnings, rose for failures */
-  --teal: #7cf3c4;
-  --teal-ink: #062018;
-  --teal-soft: rgb(124 243 196 / 0.12);
-  --teal-glow: 0 0 0 1px rgb(124 243 196 / 0.35), 0 0 24px rgb(124 243 196 / 0.22);
-  --amber: #f3b27c;
-  --amber-soft: rgb(243 178 124 / 0.12);
-  --amber-glow: 0 0 0 1px rgb(243 178 124 / 0.35), 0 0 24px rgb(243 178 124 / 0.2);
-  --rose: #f37c8a;
-  --rose-soft: rgb(243 124 138 / 0.12);
+  --teal: #6ee7c0;
+  --teal-ink: #04261b;
+  --teal-soft: rgb(110 231 192 / 0.12);
+  --teal-glow: 0 0 0 1px rgb(110 231 192 / 0.35), 0 0 24px rgb(110 231 192 / 0.22);
+  --amber: #f5b46a;
+  --amber-soft: rgb(245 180 106 / 0.12);
+  --amber-glow: 0 0 0 1px rgb(245 180 106 / 0.35), 0 0 24px rgb(245 180 106 / 0.2);
+  --rose: #ff9b8a;
+  --rose-soft: rgb(255 155 138 / 0.12);
+  --blue: #8ab4ff;
+  --blue-soft: rgb(138 180 255 / 0.12);
   --radius: 0.625rem;
 
   /* shadcn/ui variable names, mapped onto the tokens above */
@@ -69,6 +71,8 @@
   --color-amber-soft: var(--amber-soft);
   --color-rose: var(--rose);
   --color-rose-soft: var(--rose-soft);
+  --color-blue: var(--blue);
+  --color-blue-soft: var(--blue-soft);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -89,8 +93,8 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
 
-  --font-sans: var(--font-inter);
-  --font-mono: var(--font-jetbrains);
+  --font-sans: var(--font-geist);
+  --font-mono: var(--font-geist-mono);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

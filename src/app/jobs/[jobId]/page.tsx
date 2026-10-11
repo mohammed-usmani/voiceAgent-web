@@ -11,18 +11,19 @@ import { PageHeader } from "@/components/page-header";
 import { StatusPill } from "@/components/pill";
 import { ErrorState, SkeletonCards } from "@/components/states";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+import { JobSteps, type StepId } from "@/components/job-steps";
 import { isNotFound } from "@/lib/api/errors";
 import { useJob } from "@/lib/api/queries";
 import type { Job } from "@/lib/api/types";
 
-type TabId = "criteria" | "candidates" | "campaign" | "decisions";
+type TabId = StepId;
 
-const TABS: { id: TabId; label: string; render: (job: Job) => ReactNode }[] = [
-  { id: "criteria", label: "Criteria", render: (job) => <CriteriaTab job={job} /> },
-  { id: "candidates", label: "Candidates", render: (job) => <CandidatesTab job={job} /> },
-  { id: "campaign", label: "Campaign", render: (job) => <CampaignTab job={job} /> },
-  { id: "decisions", label: "Decisions", render: (job) => <div className="p-8"><DecisionQueue jobId={job.id} /></div> },
+const TABS: { id: TabId; render: (job: Job) => ReactNode }[] = [
+  { id: "criteria", render: (job) => <CriteriaTab job={job} /> },
+  { id: "candidates", render: (job) => <CandidatesTab job={job} /> },
+  { id: "campaign", render: (job) => <CampaignTab job={job} /> },
+  { id: "decisions", render: (job) => <div className="p-8"><DecisionQueue jobId={job.id} /></div> },
 ];
 
 function JobWorkspace() {
@@ -61,9 +62,7 @@ function JobWorkspace() {
       />
       <JobBanner job={j} />
       <Tabs value={tab} onValueChange={(t) => router.replace(`/jobs/${j.id}?tab=${t}`, { scroll: false })}>
-        <TabsList className="mx-8 mt-4">
-          {TABS.map((t) => <TabsTrigger key={t.id} value={t.id}>{t.label}</TabsTrigger>)}
-        </TabsList>
+        <JobSteps job={j} />
         {TABS.map((t) => <TabsContent key={t.id} value={t.id}>{t.render(j)}</TabsContent>)}
       </Tabs>
     </>

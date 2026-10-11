@@ -9,15 +9,15 @@ export function Captions({ captions, lines = 12 }: { captions: Caption[]; lines?
   useEffect(() => {
     if (ref.current) ref.current.scrollTop = ref.current.scrollHeight;
   }, [captions]);
-  if (captions.length === 0) return <p className="h-36 px-4 py-3 text-sm text-text-dim">Captions appear as soon as someone speaks.</p>;
+  if (captions.length === 0) return <p className="h-40 px-4 py-3 text-sm text-text-dim">Captions appear as soon as someone speaks.</p>;
   return (
-    <div ref={ref} className="h-36 space-y-2 overflow-y-auto px-4 py-3 text-sm" aria-live="polite">
+    <div ref={ref} className="h-40 space-y-2.5 overflow-y-auto px-4 py-3 text-sm leading-relaxed" aria-live="polite">
       {captions.slice(-lines).map((c) => (
-        <p key={c.id} className={cn(!c.final && "opacity-70")}>
-          <span className={cn("mr-2 text-[11px] tracking-wider uppercase", c.role === "agent" ? "text-teal" : "text-text-muted")}>
+        <p key={c.id} className={cn("grid grid-cols-[5.5rem_minmax(0,1fr)] gap-2", !c.final && "opacity-70")}>
+          <span className={cn("pt-px text-[11px] font-semibold tracking-wider uppercase", c.role === "agent" ? "text-blue" : "text-teal")}>
             {c.role === "agent" ? "Agent" : "Candidate"}
           </span>
-          {c.text}
+          <span>{c.text}</span>
         </p>
       ))}
     </div>

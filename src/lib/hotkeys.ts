@@ -14,6 +14,12 @@ export function matchesHotkey(e: KeyLike, combo: string): boolean {
   return e.key.toLowerCase() === key;
 }
 
+/** A bare-key shortcut (no ⌘/Ctrl) must not fire while the person is typing. */
+export function isTyping(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return target.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
+}
+
 export function useHotkey(combo: string, handler: (e: KeyboardEvent) => void, enabled = true): void {
   const ref = useRef(handler);
   useEffect(() => {
@@ -23,6 +29,7 @@ export function useHotkey(combo: string, handler: (e: KeyboardEvent) => void, en
     if (!enabled) return;
     const onKey = (e: KeyboardEvent) => {
       if (!matchesHotkey(e, combo)) return;
+      if (!combo.includes("mod+") && isTyping(e.target)) return;
       e.preventDefault();
       ref.current(e);
     };

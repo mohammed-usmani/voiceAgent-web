@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { ActiveCall } from "@/lib/api/types";
 import { candidate, summary } from "@/test/fixtures";
-import { outcomeBuckets, overviewStats } from "./overview";
+import { type JobProgress, nextStep, overviewStats, screenedCount } from "./overview";
 
 describe("overviewStats", () => {
   it("counts today's decisions in the given time zone, and everything awaiting review", () => {
@@ -22,29 +22,33 @@ describe("overviewStats", () => {
   });
 });
 
-describe("outcomeBuckets", () => {
-  it("counts each candidate once: by latest decision, else by status", () => {
-    const decisions = [
-      summary({ id: "a", candidate_id: "c1", result: "suitable" }),
-      summary({ id: "b", candidate_id: "c2", result: "needs_review", final_result: "not_suitable" }),
-    ];
-    const candidates = [
-      candidate("c1", "decided"),
-      candidate("c2", "notified"),
-      candidate("c3", "no_answer"),
-      candidate("c4", "callback"),
-      candidate("c5", "pending"),
-    ];
-    const counts = Object.fromEntries(outcomeBuckets(decisions, candidates).map((b) => [b.key, b.count]));
-    expect(counts).toEqual({
-      suitable: 1,
-      not_suitable: 1,
-      needs_review: 0,
-      callback: 1,
-      no_answer: 1,
-      unreachable: 0,
-      declined_consent: 0,
-      withdrawn: 0,
-    });
+describe("nextStep", () => {
+  const job = (status: Parameters<typeof nextStep>[0]["status"]) => ({ id: "j", status });
+  const p = (o: Partial<JobProgress> = {}): JobProgress => ({ live: 0, pendingReview: 0, candidates: 3, campaign: "active", ...o });
+
+  it("puts a live call first, whatever else is going on", () => {
+    expect(nextStep(job("active"), p({ live: 2, pendingReview: 4 }))).toEqual({ kind: "live", label: "2 calls live" });
+  });
+
+  it("walks a job through setup in order", () => {
+    expect(nextStep(job("criteria_ready"), p())).toMatchObject({ label: "Approve criteria", href: "/jobs/j?tab=criteria", urgent: true });
+    expect(nextStep(job("active"), p({ candidates: 0, campaign: null }))).toMatchObject({ label: "Add candidates", href: "/jobs/j?tab=candidates" });
+    expect(nextStep(job("active"), p({ campaign: null }))).toMatchObject({ label: "Start calling", href: "/jobs/j?tab=campaign" });
+    expect(nextStep(job("active"), p({ campaign: "paused" }))).toMatchObject({ label: "Resume calling" });
+  });
+
+  it("asks for reviews before anything else on an active job", () => {
+    expect(nextStep(job("active"), p({ pendingReview: 2, campaign: null }))).toMatchObject({ label: "Review 2", href: "/jobs/j?tab=decisions" });
+  });
+
+  it("has nothing to do once a campaign is done or the job is closed", () => {
+    expect(nextStep(job("active"), p({ campaign: "done" }))).toEqual({ kind: "none", label: "All decided" });
+    expect(nextStep(job("closed"), p())).toEqual({ kind: "none", label: "Closed" });
+  });
+});
+
+describe("screenedCount", () => {
+  it("counts finished calls only", () => {
+    expect(screenedCount([candidate("a", "decided"), candidate("b", "notified"), candidate("c", "no_answer"), candidate("d", "pending")])).toBe(2);
   });
 });
