@@ -48,6 +48,11 @@
   --ring: var(--teal);
 }
 
+@theme {
+  /* the content width below which pages stack their two columns (@wide: variant) */
+  --container-wide: 52rem;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-panel: var(--panel);
@@ -114,7 +119,6 @@
   }
   body {
     @apply bg-bg font-sans text-text antialiased;
-    min-width: 1280px;
   }
 }
 

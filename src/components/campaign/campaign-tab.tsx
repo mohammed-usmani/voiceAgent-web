@@ -34,7 +34,7 @@ export function CampaignTab({ job }: { job: Job }) {
 
   return (
     <div className="space-y-6 p-8">
-      <div className="grid grid-cols-[minmax(0,1fr)_17rem] gap-6">
+      <div className="grid gap-6 @wide:grid-cols-[minmax(0,1fr)_17rem]">
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">Campaign {c ? <StatusPill status={c.status} /> : <Pill>Not started</Pill>}</CardTitle>

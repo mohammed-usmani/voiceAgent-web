@@ -79,7 +79,7 @@ function Evaluation() {
             </p>
             {r.aborted && <p role="alert" className="rounded-lg border border-amber/30 bg-amber-soft p-3 text-sm text-amber">Stopped early: {r.aborted}. The numbers cover what ran.</p>}
             <StageCards summary={r.summary} comparison={r.comparison.rows} />
-            <div className="grid grid-cols-2 gap-6">
+            <div className="grid gap-6 @wide:grid-cols-2">
               <DecisionMatrix calls={r.calls} />
               <RunCompare runs={runs.data ?? []} current={r} other={other.data} onPick={(name) => setParam("compare", name)} />
             </div>

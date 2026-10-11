@@ -38,10 +38,10 @@ export function CriteriaReview({ job, criteria, toolbar, onEdit, onDelete }: Pro
   const facts = criteria.job_facts;
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-6 p-8">
+    <div className="grid gap-6 p-8 @wide:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       <div className="space-y-6">
         {steps.length > 0 && <AgentSteps steps={steps} working={false} />}
-        <div className="sticky top-4"><JobDescription text={text} spans={spans} active={active} /></div>
+        <div className="@wide:sticky @wide:top-4"><JobDescription text={text} spans={spans} active={active} /></div>
       </div>
       <div className="space-y-4">
         {toolbar}

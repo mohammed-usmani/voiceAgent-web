@@ -13,7 +13,7 @@ import { JobDescription } from "./job-description";
 function Generating({ job }: { job: Job }) {
   const { recent } = useEvents();
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] gap-6 p-8">
+    <div className="grid gap-6 p-8 @wide:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
       <AgentSteps steps={criteriaSteps(recent, job.id)} working />
       <JobDescription text={sourceText(job)} spans={[]} active={null} />
     </div>

@@ -149,7 +149,7 @@ export default function CandidatePage() {
           </>
         }
       />
-      <div className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-6 p-8">
+      <div className="grid gap-6 p-8 @wide:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <div className="space-y-6">
           <section aria-labelledby="calls-heading" className="space-y-3">
             <h2

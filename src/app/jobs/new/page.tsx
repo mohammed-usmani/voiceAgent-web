@@ -53,7 +53,7 @@ export default function NewJobPage() {
   return (
     <>
       <PageHeader title="New job" subtitle="Paste the job description: the criteria agent turns it into screening questions you approve." />
-      <form onSubmit={onSubmit} className="grid grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] gap-6 p-8">
+      <form onSubmit={onSubmit} className="grid gap-6 p-8 @wide:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
         <Card>
           <CardHeader>
             <CardTitle>The role</CardTitle>

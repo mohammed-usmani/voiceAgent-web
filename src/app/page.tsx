@@ -47,7 +47,7 @@ export default function OverviewPage() {
     <>
       {header}
       <div className="space-y-6 p-8">
-        <section className="grid grid-cols-5 gap-4" aria-label="Today">
+        <section className="grid grid-cols-3 gap-4 @wide:grid-cols-5" aria-label="Today">
           <StatTile label="Live now" value={stats?.liveNow ?? "—"} live={(stats?.liveNow ?? 0) > 0} sub="calls in progress" />
           <StatTile label="Screened today" value={stats?.screenedToday ?? "—"} sub="decisions made" />
           <StatTile label="Suitable today" value={stats?.suitableToday ?? "—"} sub="after any override" />
@@ -61,7 +61,7 @@ export default function OverviewPage() {
         {jobs.isPending ? (
           <SkeletonCards count={3} />
         ) : (
-          <div className="grid grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)] gap-6">
+          <div className="grid gap-6 @wide:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
             <JobsPanel jobs={jobs.data ?? []} candidates={candidates.data} />
             <OutcomeChart buckets={outcomeBuckets(decisions.data ?? [], candidates.data)} />
           </div>

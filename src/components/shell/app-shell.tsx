@@ -14,7 +14,7 @@ import { useRailOpen } from "./use-rail-open";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const health = useHealth();
-  const [railOpen, setRailOpen] = useRailOpen();
+  const [railOpen, setRailOpen, railOverlay] = useRailOpen();
   const { state, dispatch } = useLiveCalls();
   const toggleRail = () => setRailOpen(!railOpen);
   useHotkey("mod+.", toggleRail);
@@ -22,10 +22,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   if (health.isError) return <BackendDown onRetry={() => void health.refetch()} retrying={health.isFetching} />;
   return (
-    <div className="grid h-screen grid-cols-[15rem_minmax(0,1fr)_auto] overflow-hidden">
-      <Sidebar />
-      <main className="min-w-0 overflow-y-auto pb-24">{children}</main>
-      <ActivityRail open={railOpen} onOpenChange={setRailOpen} />
+    // Below lg the sidebar is an icon rail; below xl the activity rail is a drawer over the content.
+    // `main` is a size container, so pages lay out by the room they get, not by the window.
+    <div className="grid h-screen grid-cols-[3.5rem_minmax(0,1fr)] overflow-hidden lg:grid-cols-[15rem_minmax(0,1fr)] xl:grid-cols-[15rem_minmax(0,1fr)_auto]">
+      <Sidebar onShowActivity={railOverlay ? toggleRail : undefined} />
+      <main className="@container min-w-0 overflow-y-auto pb-24">{children}</main>
+      <ActivityRail open={railOpen} onOpenChange={setRailOpen} overlay={railOverlay} />
       <EventToasts />
       <LiveLayer />
       <CommandPalette onToggleRail={toggleRail} />

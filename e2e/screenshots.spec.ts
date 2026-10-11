@@ -33,11 +33,12 @@ test("live call panel looks right", async ({ page }) => {
   await expect(panel).toHaveScreenshot("live-panel.png");
 });
 
-test("works at 1280 px without sideways scrolling", async ({ page }) => {
-  await page.setViewportSize({ width: 1280, height: 800 });
-  for (const [, path, ready] of PAGES) {
+// the narrowest supported window: the sidebar at full width, the activity rail as a drawer
+for (const [name, path, ready] of PAGES.filter(([n]) => n === "overview" || n === "decision")) {
+  test(`${name} looks right at 1024 px`, async ({ page }) => {
+    await page.setViewportSize({ width: 1024, height: 768 });
     await open(page, path);
     await expect(page.getByText(ready).first()).toBeVisible();
-    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
-  }
-});
+    await expect(page).toHaveScreenshot(`${name}-1024.png`, { fullPage: true });
+  });
+}

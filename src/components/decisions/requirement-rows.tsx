@@ -8,7 +8,8 @@ import { cn } from "@/lib/utils";
 export function RequirementRows({ rows }: { rows: DecisionRow[] }) {
   return (
     <div className="rounded-xl border border-line bg-panel">
-      <Table>
+      {/* below ~48rem the table scrolls inside its box rather than squeezing the quotes into slivers */}
+      <Table className="min-w-[48rem]">
         <TableHeader>
           <TableRow>
             <TableHead>Requirement</TableHead>

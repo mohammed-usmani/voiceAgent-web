@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useState, useSyncExternalStore } from "react";
 
 const KEY = "activity-rail-open";
 const listeners = new Set<() => void>();
@@ -24,7 +24,21 @@ function subscribe(l: () => void) {
   };
 }
 
-export function useRailOpen(): [boolean, (open: boolean) => void] {
+const XL = "(min-width: 1280px)"; // Tailwind's xl: the rail takes layout space from here up
+
+function subscribeWidth(l: () => void) {
+  const mq = window.matchMedia(XL);
+  mq.addEventListener("change", l);
+  return () => mq.removeEventListener("change", l);
+}
+
+/**
+ * [open, setOpen, overlay]. From xl up the rail is a column whose state is remembered;
+ * below xl it is a drawer over the content that starts closed and isn't remembered.
+ */
+export function useRailOpen(): [boolean, (open: boolean) => void, boolean] {
+  const wide = useSyncExternalStore(subscribeWidth, () => window.matchMedia(XL).matches, () => true);
+  const [drawer, setDrawer] = useState(false);
   const open = useSyncExternalStore(subscribe, read, () => true);
   const set = useCallback((value: boolean) => {
     memory = value;
@@ -35,5 +49,5 @@ export function useRailOpen(): [boolean, (open: boolean) => void] {
     }
     for (const l of listeners) l();
   }, []);
-  return [open, set];
+  return wide ? [open, set, false] : [drawer, setDrawer, true];
 }

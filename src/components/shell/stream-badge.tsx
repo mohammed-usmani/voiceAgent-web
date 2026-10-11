@@ -7,9 +7,9 @@ const LABEL: Record<StreamStatus, string> = { open: "Live", connecting: "Connect
 
 export function StreamBadge({ status }: { status: StreamStatus }) {
   return (
-    <div data-testid="stream-status" data-status={status} className="flex items-center gap-2 text-xs text-text-muted">
+    <div data-testid="stream-status" data-status={status} title={LABEL[status]} className="flex items-center gap-2 text-xs text-text-muted">
       <span className={cn("size-2 rounded-full", status === "open" ? "bg-teal glow" : status === "reconnecting" ? "animate-pulse bg-amber" : "bg-text-dim")} />
-      {LABEL[status]}
+      <span className="max-lg:sr-only">{LABEL[status]}</span>
     </div>
   );
 }

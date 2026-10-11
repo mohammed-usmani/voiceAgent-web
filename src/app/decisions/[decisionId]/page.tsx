@@ -82,7 +82,7 @@ export default function DecisionPage() {
       />
       <div className="space-y-6 p-8">
         <section
-          className="flex items-center gap-10 rounded-xl border border-line bg-panel px-6 py-5"
+          className="flex flex-wrap items-center gap-x-10 gap-y-4 rounded-xl border border-line bg-panel px-6 py-5"
           aria-label="Verdict"
         >
           <div>
@@ -109,7 +109,7 @@ export default function DecisionPage() {
             </p>
             <StatusPill status={d.status} className="mt-1.5" />
           </div>
-          <p className="ml-auto max-w-md text-sm text-text-muted">
+          <p className="max-w-md text-sm text-text-muted @wide:ml-auto">
             {d.summary}
           </p>
         </section>
@@ -139,7 +139,7 @@ export default function DecisionPage() {
               </p>
             )}
           </div>
-          <div className="grid grid-cols-2 items-start gap-6">
+          <div className="grid items-start gap-6 @wide:grid-cols-2">
             <ReviewerCard review={d.agent_review} />
             <MessageEditor decision={d} />
           </div>

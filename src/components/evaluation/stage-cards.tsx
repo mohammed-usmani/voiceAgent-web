@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 export function StageCards({ summary, comparison }: { summary: Record<string, MetricValue>; comparison: EvalComparisonRow[] }) {
   const deltas = new Map(comparison.map((r) => [r.metric, r.delta]));
   return (
-    <div className="grid grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 gap-4 @wide:grid-cols-3">
       {stageCards(summary).map((stage) => (
         <Card key={stage.id}>
           <CardHeader>
