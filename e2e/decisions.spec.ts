@@ -43,6 +43,15 @@ test("override a decision that needs review", async ({ page }) => {
   );
 });
 
+test("a summary keeps its lines", async ({ page }) => {
+  await open(page, "/decisions/dec-rahul");
+  const summary = page.getByLabel("Verdict").getByText(/close to the line/);
+  // innerText follows the CSS: a collapsed "\n" would come back as a space
+  expect(await summary.evaluate((el) => (el as HTMLElement).innerText)).toBe(
+    "Score 0.55 (pass mark 0.60): close to the line\nLow confidence: handling an upset customer",
+  );
+});
+
 test("the review queue lists pending decisions", async ({ page }) => {
   await open(page, "/decisions");
   await expect(page.getByRole("link", { name: "Rahul Verma" })).toBeVisible();

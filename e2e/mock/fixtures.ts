@@ -270,7 +270,7 @@ export function seed(): MockState {
   const decRahul = decision("dec-rahul", rahul, "call-rahul-1", {
     result: "needs_review",
     score: 0.55,
-    summary: "Score 0.55 (pass mark 0.60): close to the line",
+    summary: "Score 0.55 (pass mark 0.60): close to the line\nLow confidence: handling an upset customer",
     created_at: "2026-10-10T07:48:00Z",
     agent_review: { agree: false, notes: "The answer on upset customers is vague; a recruiter should decide.", challenged: "suitable", model: "reviewer (fake)" },
   });

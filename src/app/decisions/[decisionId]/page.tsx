@@ -109,7 +109,7 @@ export default function DecisionPage() {
             </p>
             <StatusPill status={d.status} className="mt-1.5" />
           </div>
-          <p className="max-w-md text-sm text-text-muted @wide:ml-auto">
+          <p className="max-w-md text-sm whitespace-pre-line text-text-muted @wide:ml-auto">
             {d.summary}
           </p>
         </section>
