@@ -10,7 +10,7 @@ playwright-report/
 test-results/
 blob-report/
 .DS_Store
-# AI tooling never goes in this repo
+# editor and tooling files (next dev can generate the first two)
 CLAUDE.md
 AGENTS.md
 .claude/

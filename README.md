@@ -1,6 +1,6 @@
 # voiceAgent-web
 
-The recruiter's screen for [voiceAgent](../voiceAgent), an AI phone-screening backend: a job
+The recruiter's screen for [voiceAgent](https://github.com/mohammed-usmani/voiceAgent), an AI phone-screening backend: a job
 description becomes screening criteria, an agent phones candidates, every call ends in a decision a
 recruiter reviews, and an evaluation suite measures each stage.
 
@@ -19,6 +19,8 @@ recruiter reviews, and an evaluation suite measures each stage.
   candidate's transcript, run comparison and the known limits.
 
 ![Overview](e2e/screenshots.spec.ts-snapshots/overview-chromium-darwin.png)
+
+![A live call](e2e/screenshots.spec.ts-snapshots/live-panel-chromium-darwin.png)
 
 ## How it fits together
 
@@ -41,7 +43,7 @@ agent — see its README).
 uv run screening-api            # the REST API (SCREENING_API_KEY in its .env)
 uv run screening-worker         # criteria, campaigns, assessments, emails
 uv run voiceagent dev           # the call agent
-uv run screening-demo-seed      # optional: a demo workspace (2–3 jobs, ~12 candidates)
+uv run screening-demo-seed      # optional: a demo workspace (2 jobs, 12 candidates)
 
 # here
 cp .env.example .env.local      # set SCREENING_API_URL and SCREENING_API_KEY
