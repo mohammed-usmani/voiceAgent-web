@@ -25,12 +25,19 @@ export function parseEvent(raw: unknown): ApiEvent | null {
   try {
     const v: unknown = JSON.parse(raw);
     if (
-      typeof v === "object" && v !== null &&
-      "id" in v && typeof v.id === "number" &&
-      "entity" in v && typeof v.entity === "string" &&
-      "entity_id" in v && typeof v.entity_id === "string" &&
-      "type" in v && typeof v.type === "string" &&
-      "data" in v && typeof v.data === "object" && v.data !== null
+      typeof v === "object" &&
+      v !== null &&
+      "id" in v &&
+      typeof v.id === "number" &&
+      "entity" in v &&
+      typeof v.entity === "string" &&
+      "entity_id" in v &&
+      typeof v.entity_id === "string" &&
+      "type" in v &&
+      typeof v.type === "string" &&
+      "data" in v &&
+      typeof v.data === "object" &&
+      v.data !== null
     ) {
       return v as ApiEvent;
     }
@@ -43,7 +50,9 @@ export function parseEvent(raw: unknown): ApiEvent | null {
 /** One EventSource that resumes after the last event id (`?after=`) whenever it drops.
  * Returns a function that closes it for good. */
 export function startEventStream(o: StreamOptions): () => void {
-  const open = o.open ?? ((url: string) => new EventSource(url) as unknown as EventSourceLike);
+  const open =
+    o.open ??
+    ((url: string) => new EventSource(url) as unknown as EventSourceLike);
   const delays = o.delays ?? [1000, 2000, 5000];
   let lastId: number | null = null;
   let attempt = 0;

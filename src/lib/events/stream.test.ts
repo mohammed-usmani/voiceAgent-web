@@ -1,5 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { type EventSourceLike, parseEvent, startEventStream, type StreamStatus } from "./stream";
+import {
+  type EventSourceLike,
+  parseEvent,
+  startEventStream,
+  type StreamStatus,
+} from "./stream";
 
 class FakeSource implements EventSourceLike {
   static all: FakeSource[] = [];
@@ -14,7 +19,16 @@ class FakeSource implements EventSourceLike {
     this.closed = true;
   }
   send(id: number, type = "answered") {
-    this.onmessage?.({ data: JSON.stringify({ id, entity: "call", entity_id: "c", type, data: {}, created_at: "" }) });
+    this.onmessage?.({
+      data: JSON.stringify({
+        id,
+        entity: "call",
+        entity_id: "c",
+        type,
+        data: {},
+        created_at: "",
+      }),
+    });
   }
 }
 
@@ -88,7 +102,11 @@ describe("startEventStream", () => {
 
 describe("parseEvent", () => {
   it("accepts only event rows", () => {
-    expect(parseEvent('{"id":1,"entity":"job","entity_id":"j","type":"created","data":{},"created_at":""}')).toMatchObject({ id: 1 });
+    expect(
+      parseEvent(
+        '{"id":1,"entity":"job","entity_id":"j","type":"created","data":{},"created_at":""}',
+      ),
+    ).toMatchObject({ id: 1 });
     expect(parseEvent('{"id":"1"}')).toBeNull();
     expect(parseEvent(42)).toBeNull();
   });

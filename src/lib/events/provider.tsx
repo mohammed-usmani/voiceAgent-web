@@ -1,9 +1,20 @@
 "use client";
 
 import { useQueryClient } from "@tanstack/react-query";
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import {
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { api } from "@/lib/api/client";
 import type { ApiEvent } from "@/lib/api/types";
 import { keysFor } from "./invalidation";
+import { mergeRecent } from "./recent";
 import { startEventStream, type StreamStatus } from "./stream";
 
 type Listener = (e: ApiEvent) => void;
@@ -13,7 +24,8 @@ interface EventsValue {
   subscribe(listener: Listener): () => void;
 }
 
-const MAX_RECENT = 200;
+// How much history the activity feed opens with; the stream itself starts at the newest event.
+const HISTORY = 50;
 const EventsContext = createContext<EventsValue | null>(null);
 
 export function EventsProvider({ children }: { children: ReactNode }) {
@@ -29,13 +41,21 @@ export function EventsProvider({ children }: { children: ReactNode }) {
         onStatus: setStatus,
         onReconnected: () => void qc.invalidateQueries(),
         onEvent: (e) => {
-          for (const queryKey of keysFor(e)) void qc.invalidateQueries({ queryKey });
-          setRecent((r) => [e, ...r].slice(0, MAX_RECENT));
+          for (const queryKey of keysFor(e))
+            void qc.invalidateQueries({ queryKey });
+          setRecent((r) => mergeRecent(r, [e]));
           for (const l of listeners.current) l(e);
         },
       }),
     [qc],
   );
+
+  useEffect(() => {
+    // History goes into the feed only: it never fires toasts or listeners.
+    api<ApiEvent[]>(`/events?last=${HISTORY}`)
+      .then((history) => setRecent((r) => mergeRecent(r, history)))
+      .catch(() => {});
+  }, []);
 
   const subscribe = useCallback((l: Listener) => {
     listeners.current.add(l);
@@ -43,8 +63,13 @@ export function EventsProvider({ children }: { children: ReactNode }) {
       listeners.current.delete(l);
     };
   }, []);
-  const value = useMemo(() => ({ status, recent, subscribe }), [status, recent, subscribe]);
-  return <EventsContext.Provider value={value}>{children}</EventsContext.Provider>;
+  const value = useMemo(
+    () => ({ status, recent, subscribe }),
+    [status, recent, subscribe],
+  );
+  return (
+    <EventsContext.Provider value={value}>{children}</EventsContext.Provider>
+  );
 }
 
 export function useEvents(): EventsValue {
