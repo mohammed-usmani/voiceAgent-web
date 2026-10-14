@@ -1,10 +1,14 @@
 # voiceAgent-web
 
+[![Demo: a real screening call, end to end](https://img.youtube.com/vi/UO8bbi6Go_w/hqdefault.jpg)](https://www.youtube.com/watch?v=UO8bbi6Go_w)
+
+**Demo (5 min):** [a real call to my phone, from job description to decision and email](https://www.youtube.com/watch?v=UO8bbi6Go_w). 90-second version: [youtu.be/Z1k4k22qc9c](https://youtu.be/Z1k4k22qc9c).
+
 The recruiter's screen for [voiceAgent](https://github.com/mohammed-usmani/voiceAgent), an AI phone-screening backend: a job
 description becomes screening criteria, an agent phones candidates, every call ends in a decision a
 recruiter reviews, and an evaluation suite measures each stage.
 
-- **Overview**: today's numbers, jobs and their campaigns, outcomes, latest decisions.
+- **Today**: what needs the recruiter now (a live call, decisions to review, criteria to approve), today's numbers, and each job's next step; the activity feed sits alongside.
 - **New job**: the criteria agent drafts, critiques and revises live; each requirement shows where in
   the description it came from, and lines it dropped (e.g. illegal criteria) are struck through.
 - **Job workspace**: criteria (edit, approve), candidates (add, import CSV, call, stop calling,
