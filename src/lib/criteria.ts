@@ -90,10 +90,14 @@ function isStep(v: unknown): v is CriteriaStepName {
 export function summaryText(summary: unknown): string {
   if (typeof summary === "string") return summary;
   if (typeof summary !== "object" || summary === null || Array.isArray(summary)) return "";
-  return Object.entries(summary)
-    .filter(([, v]) => v !== null && v !== undefined && v !== "")
-    .map(([k, v]) => `${humanize(k).toLowerCase()} ${Array.isArray(v) ? v.length : String(v)}`)
-    .join(" · ");
+  const part = ([k, v]: [string, unknown]): string => {
+    if (v === null || v === undefined || v === "") return "";
+    if (Array.isArray(v)) return `${humanize(k).toLowerCase()} ${v.length}`;
+    // a breakdown such as the critique's {"kinds": {"ungrounded": 1}}: name each entry, not the key
+    if (typeof v === "object") return Object.entries(v).map(part).filter(Boolean).join(", ");
+    return `${humanize(k).toLowerCase()} ${String(v)}`;
+  };
+  return Object.entries(summary).map(part).filter(Boolean).join(" · ");
 }
 
 export interface CriteriaStep {

@@ -85,5 +85,7 @@ describe("summaryText", () => {
     expect(summaryText("6 requirements")).toBe("6 requirements");
     expect(summaryText({ requirements: 6, warnings: ["a", "b"], note: null })).toBe("requirements 6 · warnings 2");
     expect(summaryText(undefined)).toBe("");
+    expect(summaryText({ issues: 3, kinds: { illegal: 1, ungrounded: 2 } })).toBe("issues 3 · illegal 1, ungrounded 2");
+    expect(summaryText({ issues: 0, kinds: {} })).toBe("issues 0");
   });
 });

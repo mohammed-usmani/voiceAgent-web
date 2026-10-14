@@ -24,7 +24,7 @@ export function AgentSteps({ steps, working }: { steps: CriteriaStep[]; working:
                 <span className={cn("absolute top-1.5 -left-[5px] size-2.5 rounded-full bg-teal", current && "glow animate-pulse")} aria-hidden />
                 <p className="text-sm font-medium">
                   {STEP_INFO[s.step].label}
-                  {s.round > 1 && <span className="num ml-2 text-xs text-text-dim">round {s.round}</span>}
+                  {s.round > 1 && <>{" "}<span className="num ml-1 text-xs text-text-dim">round {s.round}</span></>}
                 </p>
                 <p className="text-xs text-text-muted">{STEP_INFO[s.step].what}</p>
                 {s.summary && <p className="num mt-1 text-xs text-text">{s.summary}</p>}
